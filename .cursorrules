@@ -1,0 +1,332 @@
+# Project Coding Guidelines
+
+## Project Structure
+- Use the `app` directory for routing
+- Keep components in `components/` directory, organized by feature/domain
+- Place reusable hooks in `hooks/` directory
+- Store types and interfaces in `types/` directory
+- Maintain constants in `lib/constants.ts`
+- Keep utility functions in `lib/utils.ts`
+
+## Component Architecture
+### File Organization
+```
+components/
+  ├── ui/               # shadcn/ui components
+  ├── layout/          # Layout components
+  ├── features/        # Feature-specific components
+  └── shared/          # Shared components
+```
+
+### Component Best Practices
+- Use TypeScript for all components
+- Implement proper prop typing
+- Default to server components unless client interactivity is needed
+- Add 'use client' directive only when necessary
+- Keep components focused and single-responsibility
+- Use composition over inheritance
+
+## Styling Guidelines
+
+### Tailwind CSS
+- Use Tailwind's utility classes exclusively
+- Avoid custom CSS unless absolutely necessary
+- Follow mobile-first responsive design
+- Use standard breakpoints:
+  ```tsx
+  sm: '640px'
+  md: '768px'
+  lg: '1024px'
+  xl: '1280px'
+  2xl: '1536px'
+  ```
+
+### Color System
+```tsx
+// Use these color variables consistently
+colors: {
+  primary: 'hsl(var(--primary))',
+  secondary: 'hsl(var(--secondary))',
+  background: 'hsl(var(--background))',
+  foreground: 'hsl(var(--foreground))',
+  muted: 'hsl(var(--muted))',
+  accent: 'hsl(var(--accent))',
+}
+```
+
+### Dark Mode
+- Use `dark:` variant for dark mode styles
+- Maintain proper contrast ratios in both modes
+- Test all components in both light and dark modes
+
+## shadcn/ui Implementation
+- Import components from `@/components/ui`
+- Customize components through `components.json`
+- Follow shadcn/ui naming conventions
+- Use consistent component variants
+
+### Example Component Structure
+```tsx
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+
+interface FeatureCardProps {
+  title: string
+  description: string
+  action?: () => void
+}
+
+export function FeatureCard({ title, description, action }: FeatureCardProps) {
+  return (
+    <Card className="p-6 space-y-4">
+      <h3 className="text-xl font-semibold">{title}</h3>
+      <p className="text-muted-foreground">{description}</p>
+      {action && (
+        <Button onClick={action} variant="outline">
+          Learn More
+        </Button>
+      )}
+    </Card>
+  )
+}
+```
+
+## Performance Guidelines
+- Use Image component for optimized images
+- Implement proper loading states
+- Add suspense boundaries strategically
+- Use dynamic imports for large components
+- Implement proper caching strategies
+
+## Code Quality
+- Use ESLint with recommended Next.js rules
+- Implement Prettier for consistent formatting
+- Write unit tests for critical components
+- Use meaningful component and variable names
+- Add JSDoc comments for complex functions
+
+## State Management
+- Use React Query for server state
+- Implement Context API for global UI state
+- Keep component state minimal and focused
+- Use controlled components when possible
+
+## Accessibility
+- Include proper ARIA labels
+- Maintain keyboard navigation
+- Use semantic HTML elements
+- Test with screen readers
+- Ensure proper color contrast
+- Handle focus management
+
+## Error Handling
+- Implement error boundaries
+- Use proper form validation
+- Handle API errors gracefully
+- Show meaningful error messages
+- Log errors appropriately
+
+# AI Assistant Guidelines for Next.js/Tailwind Development
+
+## Critical Constraints
+
+### Tailwind Classes
+- NEVER use arbitrary values in square brackets (e.g., `w-[123px]`, `h-[456px]`)
+- ONLY use built-in Tailwind utility classes
+- Correct: `w-64 h-32 p-4 mt-6`
+- Incorrect: `w-[256px] h-[128px] p-[16px] mt-[24px]`
+
+### React Component Rules
+- Always include `"use client"` when using hooks or browser APIs
+- Always provide default values for optional props
+- Export components as default when creating for artifacts
+- Import React explicitly when using hooks
+
+```tsx
+// Correct component structure
+import React, { useState } from 'react'
+import { Button } from "@/components/ui/button"
+
+interface Props {
+  title?: string
+  onClick?: () => void
+}
+
+const MyComponent = ({ 
+  title = "Default Title",  // Always provide defaults
+  onClick = () => {}       // Empty function as default
+}: Props) => {
+  return <Button onClick={onClick}>{title}</Button>
+}
+
+export default MyComponent
+```
+
+### Library Imports
+Available libraries:
+- `react` (including hooks)
+- `@/components/ui/*` (shadcn components)
+- `lucide-react` (v0.263.1 only)
+- `recharts`
+- `lodash`
+
+NOT available:
+- `zod`
+- `react-hook-form`
+- Other third-party libraries
+
+### Image Handling
+- Use placeholder API for images: 
+```tsx
+<img src="/api/placeholder/400/300" alt="placeholder" />
+```
+- External image URLs are not supported
+
+### shadcn/ui Component Usage
+```tsx
+// Correct imports
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter
+} from "@/components/ui/card"
+
+// Incorrect - don't import from other sources
+import { Card } from "@shadcn/ui"
+```
+
+## Common Pitfalls to Avoid
+
+### State Management
+```tsx
+// Incorrect - hook outside component
+const [count, setCount] = useState(0)
+
+// Correct - hook inside component
+const Component = () => {
+  const [count, setCount] = useState(0)
+  return <div>{count}</div>
+}
+```
+
+### Event Handlers
+```tsx
+// Incorrect - undefined event type
+const handleClick = (e) => {}
+
+// Correct - proper typing
+const handleClick = (e: React.MouseEvent) => {}
+```
+
+### Component Updates
+- Never use truncation like "// rest of the code..."
+- Always provide complete, working code
+- Include all imports and exports
+- Include full type definitions
+
+### Styling Patterns
+```tsx
+// Correct - using standard Tailwind classes
+<div className="w-full md:w-1/2 p-4 text-lg">
+
+// Incorrect - using arbitrary values
+<div className="w-[100%] md:w-[50%] p-[16px] text-[18px]">
+```
+
+### Interactive Components
+```tsx
+// Correct - proper button usage
+<Button 
+  variant="outline"
+  size="sm"
+  onClick={() => {}}
+  className="mt-4"
+>
+  Click me
+</Button>
+
+// Incorrect - missing props or improper values
+<Button variant="custom" size="tiny">Click</Button>
+```
+
+## Valid Component Properties
+
+### Button Variants
+- `default`
+- `destructive`
+- `outline`
+- `secondary`
+- `ghost`
+- `link`
+
+### Size Options
+- `default`
+- `sm`
+- `lg`
+- `icon`
+
+### Color Properties
+```tsx
+// Use these semantic color variables
+text-primary
+text-secondary
+text-muted-foreground
+text-accent
+bg-background
+bg-foreground
+border-border
+```
+
+## Error Prevention
+
+### Type Safety
+```tsx
+// Always define interfaces/types
+interface DataItem {
+  id: string
+  value: number
+}
+
+// Use proper typing for arrays
+const items: DataItem[] = []
+
+// Type event handlers
+const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {}
+```
+
+### React Hooks
+```tsx
+// Correct hook dependencies
+useEffect(() => {
+  // effect
+}, [dependency1, dependency2])
+
+// Correct custom hook structure
+const useCustomHook = (param: string) => {
+  const [state, setState] = useState("")
+  return { state }
+}
+```
+
+### Component Exports
+```tsx
+// For artifacts - use default export
+const Component = () => {}
+export default Component
+
+// For regular components - named exports are fine
+export const Component = () => {}
+```
+
+Remember:
+- Always provide complete, working code
+- Include all necessary imports
+- Use only available libraries
+- Stick to built-in Tailwind classes
+- Provide proper TypeScript types
+- Include "use client" when needed
+- Default export for artifacts
+- Always provide default prop values
